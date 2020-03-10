@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.business.commute.mapper.CommuteMapper">
+
+	<select id="listCommuteExceptionsByPage"
+		resultType="ex.aaronfae.graduation.business.commute.model.vo.CommuteVO">
+		SELECT * FROM (SELECT c.id, c.employee_id AS
+		employeeId,e.name AS
+		employeeName,
+		d.name AS deptName, j.name AS
+		jobName,c.today, c.to_work_time AS toWorkTime,
+		c.is_to_work AS toWork ,
+		c.off_work_time AS offWorkTime, c.is_off_work
+		AS
+		offWork,
+		c.morning_called AS morningCalled, c.afternoon_called AS
+		afternoonCalled
+		FROM t_commute c INNER JOIN t_employee e ON
+		c.employee_id = e.id INNER
+		JOIN
+		t_dept d ON e.dept_id = d.id INNER JOIN
+		t_job j ON e.job_id = j.id
+		WHERE
+		c.logic_deleted = 0 AND
+		e.logic_deleted
+		= 0 AND (c.is_off_work = 0 OR
+		c.is_to_work
+		= 0 OR
+		EXISTS(SELECT 1 FROM
+		t_sys_commute WHERE
+		(c.to_work_time &gt; start_time
+		OR
+		c.off_work_time
+		&lt; end_time) AND
+		enabled=1))
+		ORDER BY c.today DESC,
+		c.employee_id) t
+		WHERE
+		t.morningCalled =
+		0 OR
+		t.afternoonCalled
+		= 0
+	</select>
+
+	<select id="listTodyCommutesByPage"
+		resultType="ex.aaronfae.graduation.business.commute.model.vo.CommuteVO">
+		SELECT c.id, c.employee_id AS
+		employeeId,e.name AS
+		employeeName,
+		d.name AS deptName, j.name AS
+		jobName,c.today,
+		c.to_work_time AS toWorkTime,
+		c.is_to_work AS toWork ,
+		c.off_work_time
+		AS offWorkTime, c.is_off_work
+		AS
+		offWork,
+		c.morning_called AS
+		morningCalled, c.afternoon_called AS
+		afternoonCalled
+		FROM t_commute c
+		INNER JOIN t_employee e ON
+		c.employee_id = e.id INNER
+		JOIN
+		t_dept d ON
+		e.dept_id = d.id INNER JOIN
+		t_job j ON e.job_id = j.id
+		WHERE
+		c.logic_deleted = 0 AND
+		e.logic_deleted
+		= 0 AND c.today = DATE(NOW())
+	</select>
+
+	<select id="listHistoryCommutesByPage"
+		resultType="ex.aaronfae.graduation.business.commute.model.vo.CommuteVO">
+		SELECT c.id, c.employee_id AS
+		employeeId,e.name AS
+		employeeName,
+		d.name AS deptName, j.name AS
+		jobName,c.today,
+		c.to_work_time AS toWorkTime,
+		c.is_to_work AS toWork ,
+		c.off_work_time
+		AS offWorkTime, c.is_off_work
+		AS
+		offWork,
+		c.morning_called AS
+		morningCalled, c.afternoon_called AS
+		afternoonCalled
+		FROM t_commute c
+		INNER JOIN t_employee e ON
+		c.employee_id = e.id
+		INNER JOIN
+		t_dept d ON
+		e.dept_id = d.id INNER JOIN
+		t_job j ON e.job_id = j.id
+		WHERE
+		c.logic_deleted = 0
+		AND
+		e.logic_deleted = 0
+		ORDER BY
+		c.today DESC,
+		c.id
+	</select>
+
+	<select id="listHistoryCommutesByFilter"
+		resultType="ex.aaronfae.graduation.business.commute.model.vo.CommuteVO">
+		SELECT c.id, c.employee_id AS
+		employeeId,e.name AS
+		employeeName,
+		d.name
+		AS deptName, j.name AS
+		jobName,c.today,
+		c.to_work_time AS toWorkTime,
+		c.is_to_work AS toWork ,
+		c.off_work_time
+		AS offWorkTime, c.is_off_work
+		AS
+		offWork,
+		c.morning_called AS
+		morningCalled, c.afternoon_called AS
+		afternoonCalled
+		FROM t_commute c
+		INNER JOIN t_employee e ON
+		c.employee_id = e.id
+		INNER JOIN
+		t_dept d ON
+		e.dept_id = d.id INNER JOIN
+		t_job j ON e.job_id = j.id
+		WHERE
+		c.logic_deleted = 0
+		AND
+		e.logic_deleted =
+		0
+		<if test="filter.dept!=null">
+			AND e.dept_id = #{filter.dept}
+		</if>
+		<if test="filter.job!=null">
+			AND e.job_id = #{filter.job}
+		</if>
+		<if test="filter.employeeName!=null and filter.employeeName!=''">
+			AND e.name like CONCAT('%', #{filter.employeeName}, "%")
+		</if>
+		ORDER BY
+		c.today DESC,
+		c.id
+	</select>
+
+	<select id="countDaysOfAttendance"
+		resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM
+		t_commute
+		WHERE employee_id =
+		#{employeeId} AND
+		logic_deleted = 0 AND (today BETWEEN #{firstDay}
+		AND
+		#{lastDay}) AND
+		is_to_work = 1
+		AND is_off_work = 1
+	</select>
+
+	<select id="isClock"
+		resultType="ex.aaronfae.graduation.business.commute.model.vo.ClockVO">
+		SELECT is_to_work, is_off_work FROM t_commute WHERE
+		employee_id = #{employeeId} AND today = DATE(NOW())
+	</select>
+
+	<select id="getRecentCommuteRecord"
+		resultType="ex.aaronfae.graduation.business.commute.model.vo.RecentCommuteRecordVO">
+		SELECT e.name AS employeeName, c.today, c.to_work_time,
+		c.is_to_work AS
+		toWork, c.off_work_time, c.is_off_work AS offWork FROM
+		t_commute c LEFT
+		JOIN t_employee e ON c.employee_id = e.id WHERE
+		employee_id = #{employeeId} ORDER
+		BY c.today DESC LIMIT 5
+	</select>
+
+	<update id="toWork">
+		UPDATE t_commute SET to_work_time = #{date},
+		is_to_work = 1 WHERE
+		employee_id = #{employeeId} AND today =
+		DATE(NOW())
+	</update>
+
+	<update id="offWork">
+		UPDATE t_commute SET off_work_time = #{date},
+		is_off_work = 1 WHERE
+		employee_id = #{employeeId} AND today =
+		DATE(NOW())
+	</update>
+
+</mapper>

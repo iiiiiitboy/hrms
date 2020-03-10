@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.business.hr.mapper.RecruitmentMapper">
+
+	<select id="listRecruitments"
+		resultType="ex.aaronfae.graduation.business.hr.model.vo.RecruitmentVO">
+		SELECT
+		r.id, d.name AS deptName, j.name AS
+		jobName,
+		type_of_working, years_of_working, number_of, address_of_working,
+		education, requirement, is_reviewed
+		AS reviewed, is_finished AS
+		finished
+		FROM
+		t_recruitment r LEFT JOIN
+		t_dept d ON r.dept_id = d.id LEFT
+		JOIN
+		t_job j ON r.job_id = j.id
+		WHERE
+		r.logic_deleted = 0
+	</select>
+
+	<select id="countApplicant" resultType="_int">
+		SELECT COUNT(*) FROM
+		t_applicant WHERE recruitment_id = #{recruitmentId}
+	</select>
+
+	<select id="listRecruitmentsByFilter"
+		resultType="ex.aaronfae.graduation.business.hr.model.vo.RecruitmentVO">
+		SELECT
+		r.id, d.name AS deptName, j.name AS
+		jobName,
+		type_of_working,
+		years_of_working, number_of, address_of_working,
+		education,
+		requirement, is_reviewed
+		AS reviewed, is_finished AS
+		finished
+		FROM
+		t_recruitment r LEFT JOIN
+		t_dept d ON r.dept_id = d.id LEFT
+		JOIN
+		t_job j
+		ON r.job_id = j.id
+		WHERE
+		r.logic_deleted = 0
+		<if test="filter.dept!=null">
+			AND r.dept_id = #{filter.dept}
+		</if>
+		<if test="filter.job!=null">
+			AND r.job_id = #{filter.job}
+		</if>
+		<if test="filter.reviewed!=null">
+			AND r.is_reviewed = #{filter.reviewed}
+		</if>
+		<if test="filter.finished!=null">
+			AND r.is_finished = #{filter.finished}
+		</if>
+	</select>
+
+	<select id="listRecruitmentForApplicant"
+		resultType="ex.aaronfae.graduation.business.hr.model.vo.RecruitmentForApplicantVO">
+		SELECT
+		r.id,d.name AS deptName,j.name AS
+		jobName,type_of_working,years_of_working,number_of,address_of_working,education,requirement,r.gmt_modified
+		AS releaseDate
+		FROM
+		t_recruitment r LEFT JOIN
+		t_dept d ON r.dept_id =
+		d.id LEFT JOIN
+		t_job j ON r.job_id = j.id
+		WHERE
+		r.logic_delete = 0 AND
+		r.is_reviewed = 1 AND r.is_finished = 0
+	</select>
+
+</mapper>

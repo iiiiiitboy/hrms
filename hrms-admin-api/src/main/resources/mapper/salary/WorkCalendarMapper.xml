@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.business.salary.mapper.WorkCalendarMapper">
+
+	<select id="countWeekdays" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM
+		t_work_calendar WHERE logic_deleted = 0
+		AND
+		calendar_type = 0 AND (days
+		BETWEEN #{firstDay} AND #{lastDay})
+	</select>
+
+</mapper>

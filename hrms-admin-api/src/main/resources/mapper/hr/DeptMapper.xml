@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.business.hr.mapper.DeptMapper">
+
+	<select id="listDeptsIdAndName"
+		resultType="ex.aaronfae.graduation.business.hr.entity.DeptDO">
+		SELECT id, name FROM
+		t_dept WHERE logic_deleted = 0
+	</select>
+
+	<select id="listDeptByPage"
+		resultType="ex.aaronfae.graduation.business.organization.model.vo.DeptVO">
+		SELECT id, name, gmt_create AS createDate FROM
+		t_dept WHERE logic_deleted = 0
+	</select>
+
+</mapper>

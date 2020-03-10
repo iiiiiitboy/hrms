@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.business.reimbursement.mapper.ReimbursementMapper">
+
+	<select id="listMyReimbursements"
+		resultType="ex.aaronfae.graduation.business.reimbursement.model.vo.ReimbursementVO">
+		SELECT r.id, r.employee_id, r.loan, r.expenses, r.debt,
+		r.reimbursements,
+		r.description, r.is_reviewed AS
+		reviewed,
+		r.is_verified AS verified,
+		r.is_finished AS finished, r.gmt_create AS
+		createDate, e.NAME AS
+		employeeName
+		FROM t_reimbursement r
+		INNER JOIN
+		t_employee e ON r.employee_id = e.id
+		WHERE
+		r.employee_id = #{employeeId}
+		AND r.logic_deleted = 0
+	</select>
+
+
+</mapper>

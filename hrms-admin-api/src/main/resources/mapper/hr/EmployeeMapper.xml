@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.business.hr.mapper.EmployeeMapper">
+
+	<select id="listEmployeesByPage"
+		resultType="ex.aaronfae.graduation.business.hr.model.vo.EmployeeVO">
+		SELECT
+		e.id,
+		e.name,
+		e.tel,
+		e.age,
+		e.gender,
+		e.email,
+		e.education,
+		d.id AS deptId,
+		j.id AS jobId,
+		d.name AS deptName,j.name AS
+		jobName,
+		e.applicant_id AS
+		applicantId,
+		e.salary,
+		e.entry_date AS
+		entryDate,
+		e.working_status AS workingStatus,
+		a.resume_path AS
+		resumePath,
+		ir.mark,
+		ir.appraisal
+		FROM
+		t_employee e LEFT JOIN
+		t_applicant a
+		ON
+		e.applicant_id =
+		a.id
+		LEFT JOIN
+		t_interview_result ir ON a.id =
+		ir.applicant_id
+		LEFT
+		JOIN
+		t_dept d
+		ON
+		e.dept_id = d.id LEFT JOIN
+		t_job j ON
+		e.job_id = j.id
+		WHERE
+		e.logic_deleted = 0 ORDER BY e.id
+	</select>
+
+	<select id="listEmployeesByFilter"
+		resultType="ex.aaronfae.graduation.business.hr.model.vo.EmployeeVO">
+		SELECT
+		e.id,
+		e.name,
+		e.tel,
+		e.age,
+		e.gender,
+		e.email,
+		e.education,
+		d.id AS
+		deptId,
+		j.id AS jobId,
+		d.name AS deptName,j.name AS
+		jobName,
+		e.applicant_id AS
+		applicantId,
+		e.salary,
+		e.entry_date AS
+		entryDate,
+		e.working_status AS workingStatus,
+		a.resume_path AS
+		resumePath,
+		ir.mark,
+		ir.appraisal
+		FROM
+		t_employee e LEFT JOIN
+		t_applicant a
+		ON
+		e.applicant_id =
+		a.id
+		LEFT JOIN
+		t_interview_result ir ON a.id =
+		ir.applicant_id
+		LEFT
+		JOIN
+		t_dept d
+		ON
+		e.dept_id = d.id LEFT JOIN
+		t_job j ON
+		e.job_id = j.id
+		WHERE
+		e.logic_deleted = 0
+		<if test="filter.dept!=null">
+			AND e.dept_id = #{filter.dept}
+		</if>
+		<if test="filter.job!=null">
+			AND e.job_id = #{filter.job}
+		</if>
+		<if test="filter.workingStatus!=null">
+			AND e.working_status = #{filter.workingStatus}
+		</if>
+		ORDER BY e.id
+	</select>
+
+	<select id="listOnlineEmployeeIds" resultType="java.lang.Long">
+		SELECT id FROM
+		t_employee WHERE logic_deleted = 0 AND working_status IN (0,1)
+	</select>
+
+	<select id="listAllEmployeeIdsAndSalaries"
+		resultType="ex.aaronfae.graduation.business.hr.model.dto.EmployeeIdsAndSalariesDTO">
+		SELECT id, salary FROM
+		t_employee WHERE logic_deleted = 0
+		AND
+		working_status NOT IN (4,5)
+	</select>
+
+	<select id="listEmployeeNamesAndIds"
+		resultType="ex.aaronfae.graduation.business.hr.model.vo.NamesAndIdsForQuickCommuteVO">
+		SELECT name AS value, id FROM
+		t_employee WHERE logic_deleted
+		= 0 AND
+		working_status NOT IN (4,5)
+	</select>
+
+	<select id="listEmployeeIdsAndNames"
+		resultType="ex.aaronfae.graduation.business.hr.model.vo.IdsAndNamesForQuickCommuteVO">
+		SELECT id AS value, name FROM
+		t_employee WHERE logic_deleted
+		= 0 AND
+		working_status NOT IN (4,5)
+	</select>
+
+
+</mapper>

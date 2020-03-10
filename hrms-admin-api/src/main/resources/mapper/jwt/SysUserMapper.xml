@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.jwt.mapper.SysUserMapper">
+
+	<resultMap id="BaseResultMap"
+		type="ex.aaronfae.graduation.jwt.SysUser">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="employee_id" property="employeeId" />
+		<result column="username" property="username" />
+		<result column="password" property="password" />
+		<result column="remarks" property="remarks" />
+		<result column="enabled" property="enabled" />
+	</resultMap>
+
+	<resultMap id="lazyLoadRoles"
+		type="ex.aaronfae.graduation.jwt.SysUser" extends="BaseResultMap">
+		<collection property="roles"
+			ofType="ex.aaronfae.graduation.jwt.SysRole"
+			select="ex.aaronfae.graduation.jwt.mapper.SysUserMapper.listRolesByUserId"
+			column="id"></collection>
+	</resultMap>
+
+	<resultMap id="currentSysUser"
+		type="ex.aaronfae.graduation.jwt.CurrentSysUserVO"
+		extends="BaseResultMap">
+		<collection property="roles"
+			ofType="ex.aaronfae.graduation.jwt.SysRole"
+			select="ex.aaronfae.graduation.jwt.mapper.SysUserMapper.listRolesByUserId"
+			column="id"></collection>
+	</resultMap>
+
+	<select id="getSysUserByUsername" resultMap="lazyLoadRoles">
+		SELECT u.id,
+		u.name,
+		u.username, u.password, u.remarks, u.enabled FROM
+		t_sys_user u WHERE
+		username = #{username} AND enabled = 1 AND logic_deleted = 0
+	</select>
+
+	<select id="listRolesByUserId"
+		resultType="ex.aaronfae.graduation.jwt.SysRole">
+		SELECT r.id, r.name, r.name_zh AS nameZh FROM
+		t_sys_role r
+		INNER JOIN t_sys_user_role ur ON r.id = ur.role_id WHERE ur.user_id =
+		#{id}
+	</select>
+
+	<insert id="saveSysUser"
+		parameterType="ex.aaronfae.graduation.jwt.SysUser"
+		useGeneratedKeys="true">
+		<!-- mysql插入数据后，获取id -->
+		<selectKey keyProperty="id" resultType="int" order="AFTER">
+			SELECT
+			LAST_INSERT_ID() as id
+		</selectKey>
+		INSERT INTO t_sys_user(name, username, password, remarks, enabled,
+		gmt_create, gmt_modified, logic_deleted) VALUES(#{name},
+		#{username},
+		#{password}, #{remarks}, #{enabled},
+		#{gmt_create},
+		#{gmt_modified},
+		#{logic_deleted})
+	</insert>
+
+	<select id="getCurrentSysUserByUsername"
+		resultMap="currentSysUser">
+		SELECT u.id,
+		u.employee_id,
+		u.name,
+		u.username FROM
+		t_sys_user u
+		WHERE
+		username = #{username} AND enabled = 1
+		AND logic_deleted = 0
+	</select>
+
+</mapper>

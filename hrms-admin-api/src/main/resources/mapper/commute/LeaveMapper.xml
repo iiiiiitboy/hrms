@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.business.commute.mapper.LeaveMapper">
+
+	<select id="listMyLeaves"
+		resultType="ex.aaronfae.graduation.business.commute.model.vo.LeaveVO">
+		SELECT l.id, l.employee_id, l.date_from, l.date_to,
+		l.hours_of_leave, l.type_of_leave, l.reason, l.is_reviewed AS
+		reviewed, l.gmt_create AS createDate, e.NAME AS employeeName FROM
+		t_leave l INNER JOIN
+		t_employee e ON l.employee_id = e.id WHERE
+		l.employee_id = #{employeeId} AND l.logic_deleted
+		= 0
+	</select>
+
+	<select id="listLeaves"
+		resultType="ex.aaronfae.graduation.business.commute.model.vo.LeaveVO">
+		SELECT l.id, l.employee_id, l.date_from, l.date_to,
+		l.hours_of_leave,
+		l.type_of_leave, l.reason, l.is_reviewed AS
+		reviewed,
+		l.gmt_create AS
+		createDate, e.NAME AS employeeName FROM
+		t_leave l INNER
+		JOIN
+		t_employee e
+		ON l.employee_id = e.id WHERE
+		l.logic_deleted = 0
+	</select>
+
+</mapper>

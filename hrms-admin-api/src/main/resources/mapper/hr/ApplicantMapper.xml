@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.business.hr.mapper.ApplicantMapper">
+
+	<select id="listApplicantsNoEmployedByPage"
+		resultType="ex.aaronfae.graduation.business.hr.model.vo.ApplicantVO">
+		SELECT
+		a.id,
+		a.name,
+		a.age,
+		a.gender,
+		a.tel,
+		a.email,
+		a.gmt_create
+		AS dateOfApplication,
+		a.is_interviewing AS interviewing,
+		a.is_interviewed AS interviewed,
+		a.is_passed AS passed,
+		a.is_employed
+		AS
+		employed,
+		a.resume_path AS resumePath,
+		a.recruitment_id AS
+		recruitmentId,
+		d.name AS deptName,j.name AS jobName
+		FROM
+		t_applicant a
+		LEFT JOIN
+		t_recruitment r ON a.recruitment_id = r.id LEFT JOIN
+		t_dept d
+		ON
+		r.dept_id = d.id LEFT JOIN
+		t_job j ON r.job_id = j.id
+		WHERE
+		a.logic_deleted = 0 AND a.is_employed = 0 AND r.logic_deleted = 0 AND
+		r.is_reviewed = 1 AND r.is_finished = 0
+	</select>
+
+	<select id="listApplicantsByFilter"
+		resultType="ex.aaronfae.graduation.business.hr.model.vo.ApplicantVO">
+		SELECT
+		a.id,
+		a.name,
+		a.age,
+		a.gender,
+		a.tel,
+		a.email,
+		a.gmt_create
+		AS
+		dateOfApplication,
+		a.is_interviewing AS interviewing,
+		a.is_interviewed
+		AS interviewed,
+		a.is_passed AS passed,
+		a.is_employed
+		AS
+		employed,
+		a.resume_path AS resumePath,
+		a.recruitment_id AS
+		recruitmentId,
+		d.name AS
+		deptName,j.name AS jobName
+		FROM
+		t_applicant a
+		LEFT JOIN
+		t_recruitment r ON
+		a.recruitment_id = r.id LEFT JOIN
+		t_dept d
+		ON
+		r.dept_id = d.id LEFT JOIN
+		t_job j ON r.job_id = j.id
+		WHERE
+		a.logic_deleted = 0 AND r.logic_deleted
+		= 0 AND
+		r.is_reviewed = 1 AND r.is_finished = 0
+		<if test="filter.dept!=null">
+			AND r.dept_id = #{filter.dept}
+		</if>
+		<if test="filter.job!=null">
+			AND r.job_id = #{filter.job}
+		</if>
+		<if test="filter.interviewed!=null and !filter.interviewed">
+			AND a.is_interviewing = 1
+		</if>
+		<if test="filter.interviewed!=null and filter.interviewed">
+			AND a.is_interviewing = 1 AND a.is_interviewed = 1
+		</if>
+		<if test="filter.employed==null">
+			AND a.is_employed = 0
+		</if>
+		<if test="filter.employed!=null and !filter.employed">
+			AND a.is_passed = 1 AND a.is_employed = 0
+		</if>
+		<if test="filter.employed!=null and filter.employed">
+			AND a.is_passed = 1 AND a.is_employed = 1
+		</if>
+	</select>
+
+	<select id="listApplicantsByPage"
+		resultType="ex.aaronfae.graduation.business.hr.model.vo.ApplicantVO">
+		SELECT
+		a.id,
+		a.name,
+		a.age,
+		a.gender,
+		a.tel,
+		a.email,
+		a.gmt_create
+		AS dateOfApplication,
+		d.id AS deptId,
+		j.id AS jobId,
+		d.name
+		AS deptName,
+		j.name AS jobName,
+		j.basic_salary AS salary,
+		'已通过面试，未入职，办理入职则确认员工入职'
+		AS 'remarks'
+		FROM
+		t_applicant a
+		LEFT JOIN
+		t_recruitment r ON
+		a.recruitment_id = r.id
+		LEFT
+		JOIN
+		t_dept d
+		ON
+		r.dept_id =
+		d.id LEFT JOIN
+		t_job j ON r.job_id =
+		j.id
+		WHERE
+		a.logic_deleted = 0 AND
+		a.is_passed = 1
+		AND a.is_employed = 0
+		AND
+		r.logic_deleted = 0 AND
+		r.is_reviewed = 1
+		UNION
+		SELECT
+		a.id,
+		a.name,
+		a.age,
+		a.gender,
+		a.tel,
+		a.email,
+		a.gmt_create AS
+		dateOfApplication,
+		d.id AS deptId,
+		j.id AS jobId,
+		d.name
+		AS
+		deptName,j.name AS jobName,
+		j.basic_salary AS salary,
+		'已入职，但未录入信息' AS
+		'remarks'
+		FROM t_applicant
+		a
+		LEFT JOIN
+		t_recruitment r ON
+		a.recruitment_id
+		= r.id
+		LEFT JOIN
+		t_dept d
+		ON
+		r.dept_id = d.id LEFT JOIN
+		t_job j ON r.job_id
+		=
+		j.id
+		WHERE
+		a.is_employed
+		=1 AND a.id NOT IN (SELECT
+		applicant_id
+		FROM
+		t_employee)
+	</select>
+
+	<select id="getResumePathById" resultType="java.lang.String">
+		SELECT resume_path
+		FROM t_applicant WHERE id = #{id}
+	</select>
+
+</mapper>

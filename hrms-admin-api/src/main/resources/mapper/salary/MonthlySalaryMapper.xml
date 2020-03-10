@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.business.salary.mapper.MonthlySalaryMapper">
+
+	<select id="listMyMonthlySalaryByPage"
+		resultType="ex.aaronfae.graduation.business.salary.model.vo.MonthlySalaryVO">
+		SELECT ms.id, d.name AS deptName, j.name AS jobName,
+		ms.employee_id, e.name AS employeeName, CONCAT(ms.YEAR, '-', ms.MONTH)
+		AS month, ms.days_of_working, ms.hours_of_working,
+		ms.days_of_attendance, ms.days_of_absence, ms.hours_of_worked,
+		ms.hours_of_overtime,e.salary AS basicSalary, ms.salary,
+		ms.is_reviewed AS reviewed
+		FROM t_monthly_salary ms
+		LEFT JOIN t_employee
+		e ON ms.employee_id = e.id LEFT JOIN t_dept d ON
+		e.dept_id = d.id LEFT
+		JOIN t_job j ON e.job_id = j.id WHERE
+		ms.employee_id =
+		#{employeeId}
+	</select>
+
+	<select id="listNoReviewedMonthlySalaryByPage"
+		resultType="ex.aaronfae.graduation.business.salary.model.vo.MonthlySalaryVO">
+		SELECT ms.id, d.name AS deptName, j.name AS jobName,
+		ms.employee_id, e.name AS employeeName, CONCAT(ms.YEAR, '-', ms.MONTH)
+		AS month, ms.days_of_working, ms.hours_of_working,
+		ms.days_of_attendance, ms.days_of_absence, ms.hours_of_worked,
+		ms.hours_of_overtime,e.salary AS basicSalary, ms.salary,
+		ms.is_reviewed AS reviewed
+		FROM t_monthly_salary ms
+		LEFT JOIN t_employee
+		e ON ms.employee_id = e.id LEFT JOIN t_dept d ON
+		e.dept_id = d.id LEFT
+		JOIN t_job j ON e.job_id = j.id WHERE
+		ms.is_reviewed = 0
+	</select>
+
+	<select id="listAllMonthlySalaryByPage"
+		resultType="ex.aaronfae.graduation.business.salary.model.vo.MonthlySalaryVO">
+		SELECT ms.id, d.name AS deptName, j.name AS jobName,
+		ms.employee_id, e.name AS employeeName, CONCAT(ms.YEAR, '-', ms.MONTH)
+		AS month, ms.days_of_working, ms.hours_of_working,
+		ms.days_of_attendance, ms.days_of_absence, ms.hours_of_worked,
+		ms.hours_of_overtime,e.salary AS basicSalary, ms.salary,
+		ms.is_reviewed AS reviewed
+		FROM t_monthly_salary ms
+		LEFT JOIN t_employee
+		e ON ms.employee_id = e.id LEFT JOIN t_dept d ON
+		e.dept_id = d.id LEFT
+		JOIN t_job j ON e.job_id = j.id
+	</select>
+
+</mapper>

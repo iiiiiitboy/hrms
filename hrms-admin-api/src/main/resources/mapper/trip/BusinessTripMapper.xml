@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ex.aaronfae.graduation.business.trip.mapper.BusinessTripMapper">
+
+	<select id="listMyBusinessTrips"
+		resultType="ex.aaronfae.graduation.business.trip.model.vo.BusinessTripVO">
+		SELECT b.id, b.employee_id, b.start_date, b.end_date,
+		b.expenses , b.reason, b.is_reviewed AS
+		reviewed, b.is_holding AS
+		holding, b.is_finished AS finished, b.check_in_time, b.is_reimbursed
+		AS reimbursed, b.gmt_create AS
+		createDate, e.NAME AS employeeName
+		FROM
+		t_business_trip b
+		INNER JOIN
+		t_employee e ON b.employee_id = e.id
+		WHERE
+		b.employee_id = #{employeeId}
+		AND b.logic_deleted = 0
+	</select>
+
+	<select id="listBusinessTripsByPage"
+		resultType="ex.aaronfae.graduation.business.trip.model.vo.BusinessTripVO">
+		SELECT b.id, b.employee_id, b.start_date, b.end_date,
+		b.expenses , b.reason, b.is_reviewed AS
+		reviewed, b.is_holding AS
+		holding, b.is_finished AS finished, b.check_in_time, b.is_reimbursed
+		AS reimbursed, b.gmt_create AS
+		createDate, e.NAME AS employeeName
+		FROM
+		t_business_trip b
+		INNER JOIN
+		t_employee e ON b.employee_id = e.id
+		WHERE
+		b.logic_deleted = 0
+	</select>
+
+</mapper>
